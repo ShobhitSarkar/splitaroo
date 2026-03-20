@@ -8,3 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+
+# scratch
+
+scratch.md
+
+# environment variables 
+
+.env
