@@ -6,7 +6,7 @@ class Item(BaseModel):
     item of an itemized reciept 
     """
     name: str
-    price: int 
+    price: float 
 
 class ItemizedReciept(BaseModel): 
     """
@@ -15,14 +15,14 @@ class ItemizedReciept(BaseModel):
     receipt: List[Item]
 
 
-class IndividualSplit(BaseModel): 
+class SharedItem(BaseModel): 
     """
-    each person and the list
+    each item and the people who shared it 
     """
     item: str 
     people: List[str]
 
-class TotalSplit(BaseModel): 
+class SplitBreakdown(BaseModel): 
     """
     Record which person got which item 
     """

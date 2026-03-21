@@ -3,7 +3,7 @@ implementation of the routers connecting to the frontend
 """
 from typing import List, Dict
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from .types import ItemizedReciept, IndividualSplit
+from .types import ItemizedReciept, SharedItem
 
 router = APIRouter(prefix="/receipt")
 
@@ -21,9 +21,10 @@ def get_reciept(file: UploadFile) -> ItemizedReciept:
     pass 
 
 @router.post("/unstructuredData")
-def who_got_what(unstructured_data: str) -> IndividualSplit: 
+def who_got_what(unstructured_data: str) -> SharedItem: 
     """
-    decipher who got what 
+    gets the unstructured data from the user and then maps the people who shared 
+    one particular item 
     
     :param unstructered_data: text description of who got what 
     :type str: just purely string description 
@@ -31,6 +32,8 @@ def who_got_what(unstructured_data: str) -> IndividualSplit:
     :rtype: IndividualSplit
     """
     pass 
+
+
 
 
 
