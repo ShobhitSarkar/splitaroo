@@ -26,7 +26,8 @@ class SplitBreakdown(BaseModel):
     """
     Record which person got which item 
     """
-    items: List[IndividualSplit]
+    items: List[SharedItem]
+
 
 
     
