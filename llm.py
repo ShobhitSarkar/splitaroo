@@ -24,6 +24,16 @@ For example, if get an input like "bob and alice got the burger" the data is goi
 look like \item: "burger", people: ["Sam", "Alex"]
 """
 
+USAGE_SITUATION_FLAGS = {
+    1 : "get_itemized_reciept", 
+    2 : "get_shared_item",
+}
+
+OUTPUT_SHAPES = {
+    1: ItemizedReciept, 
+    2: SharedItem
+}
+
 
 async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> ItemizedReciept | SharedItem: 
     """
@@ -38,13 +48,12 @@ async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> Ite
     :rtype: ItemizedReciept | SharedItem 
     """
 
-    if usage_situation_flag not in {1, 2}: 
-        return Exception("The usage situation flag is wrong")
+    if usage_situation_flag not in USAGE_SITUATION_FLAGS: 
+        return Exception("Wrong usage situation flag")
     
 
-    if output_shape not in {1, 2}: 
-        return Exception("Not a valid outputshape flag")
-    
+    if output_shape not in OUTPUT_SHAPES: 
+        return Exception("Wrong usage of output shape")
     
     if usage_situation_flag == 1: 
         system_prompt = ITEMIZED_RECIEPT_PROMPT
@@ -55,15 +64,17 @@ async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> Ite
         output = SharedItem
 
     response = client.responses.parse(
-        model="gpt-5.4-mini",
+        model="gpt-4o-2024-08-06",
         input=[
-            {"role": "system", "content": {system_prompt}}, 
+            {"role": "system", "content": {system_prompt}},
             {
-                "role": "user", 
-                "content": 
+                "role": "user",
+                "content": "Follow the system prompt only. No deviations.",
             },
-        ], 
-        text_format={output}
+        ],
+        text_format=output,
     )
 
-    return response 
+    final_result = response.output_parsed
+
+    return final_result
