@@ -4,6 +4,7 @@ implementation of the routers connecting to the frontend
 from typing import List, Dict
 from fastapi import FastAPI, File, UploadFile, APIRouter
 from .types import ItemizedReciept, SharedItem
+from .llm import get_oai_response
 
 router = APIRouter(prefix="/receipt")
 
@@ -18,7 +19,10 @@ def get_reciept(file: UploadFile) -> ItemizedReciept:
     :return: Reciept data 
     :rtype: ItemizedReciept
     """
-    pass 
+    itemized_reciept = get_oai_response("get_itemized_reciept")
+    
+
+
 
 @router.post("/unstructuredData")
 def who_got_what(unstructured_data: str) -> SharedItem: 
@@ -32,7 +36,11 @@ def who_got_what(unstructured_data: str) -> SharedItem:
     :rtype: IndividualSplit
     """
 
-    pass 
+    shared_items = get_oai_response("get_shared_item") 
+
+    price_calculator = price_calculator(shared_items)
+
+    
 
 
 

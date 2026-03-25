@@ -25,15 +25,9 @@ look like \item: "burger", people: ["Sam", "Alex"]
 """
 
 USAGE_SITUATION_FLAGS = {
-    1 : "get_itemized_reciept", 
-    2 : "get_shared_item",
+    "get_itemized_reciept" : ItemizedReciept,
+    "get_shared_item" :  SharedItem 
 }
-
-OUTPUT_SHAPES = {
-    1: ItemizedReciept, 
-    2: SharedItem
-}
-
 
 async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> ItemizedReciept | SharedItem: 
     """
@@ -55,13 +49,13 @@ async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> Ite
     if output_shape not in OUTPUT_SHAPES: 
         return Exception("Wrong usage of output shape")
     
-    if usage_situation_flag == 1: 
+    if usage_situation_flag == "get_itemized_reciept": 
         system_prompt = ITEMIZED_RECIEPT_PROMPT
-        output = ItemizedReciept
+        output = USAGE_SITUATION_FLAGS["get_itemized_reciept"]
 
-    if usage_situation_flag == 2:
+    if usage_situation_flag == "get_shared_item":
         system_prompt = PER_ITEM_SPLIT_PROMPT
-        output = SharedItem
+        output = USAGE_SITUATION_FLAGS["get_shared_item"]
 
     response = client.responses.parse(
         model="gpt-4o-2024-08-06",
