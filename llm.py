@@ -10,8 +10,10 @@ oai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=oai_api_key) 
 
 ITEMIZED_RECIEPT_PROMPT = f"""
-You are given the picture of the reciept. Your role is to look at the image of the 
-reciept and ouput the data in the reciept in the shape of the ItemizedReiept format. 
+Your are an expert reciept - analyzer system. You are given the picture of an itemized reciept. Look at the reciept and identify the items bought and their prices. 
+After you've gotten the items and prices. Your role is to identify the items and their prices in the picture of 
+the reciept. Make sure to only output the items and prices that you see in the picture, it is CRUCIAL that 
+you do so. Include the name of the item AND it's price both. 
 """
 
 PER_ITEM_SPLIT_PROMPT = f"""
@@ -29,7 +31,7 @@ USAGE_SITUATION_FLAGS = {
     "get_shared_item" :  SharedItem 
 }
 
-async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> ItemizedReciept | SharedItem: 
+async def get_oai_response(usage_situation_flag: int) -> ItemizedReciept | SharedItem: 
     """
     situation 1: picture of the receipt to the itemized data 
     situation 2: turning unstructured who-got-what into shared item shape 
@@ -45,28 +47,25 @@ async def get_oai_response(usage_situation_flag: int,  output_shape: int) -> Ite
     if usage_situation_flag not in USAGE_SITUATION_FLAGS: 
         return Exception("Wrong usage situation flag")
     
-
-    if output_shape not in OUTPUT_SHAPES: 
-        return Exception("Wrong usage of output shape")
     
     if usage_situation_flag == "get_itemized_reciept": 
         system_prompt = ITEMIZED_RECIEPT_PROMPT
-        output = USAGE_SITUATION_FLAGS["get_itemized_reciept"]
+        output_model = USAGE_SITUATION_FLAGS["get_itemized_reciept"]
 
     if usage_situation_flag == "get_shared_item":
         system_prompt = PER_ITEM_SPLIT_PROMPT
-        output = USAGE_SITUATION_FLAGS["get_shared_item"]
+        output_model = USAGE_SITUATION_FLAGS["get_shared_item"]
 
     response = client.responses.parse(
         model="gpt-4o-2024-08-06",
         input=[
-            {"role": "system", "content": {system_prompt}},
+            {"role": "system", "content": system_prompt},
             {
                 "role": "user",
-                "content": "Follow the system prompt only. No deviations.",
+                "content": "",
             },
         ],
-        text_format=output,
+        text_format=output_model,
     )
 
     final_result = response.output_parsed

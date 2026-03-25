@@ -9,7 +9,7 @@ from llm import get_oai_response
 router = APIRouter(prefix="/receipt")
 
 @router.post("/uploadReciept")
-def get_reciept(file: UploadFile) -> ItemizedReciept: 
+async def get_reciept(file: UploadFile) -> ItemizedReciept: 
     """
     get an image of the reciept and turn it into an 
     itemized reciept shape 
@@ -19,11 +19,13 @@ def get_reciept(file: UploadFile) -> ItemizedReciept:
     :return: Reciept data 
     :rtype: ItemizedReciept
     """
-    itemized_reciept = get_oai_response("get_itemized_reciept")
+    itemized_reciept = await get_oai_response("get_itemized_reciept")
+
+    return itemized_reciept
     
 
 @router.post("/unstructuredData")
-def who_got_what(unstructured_data: str) -> SharedItem: 
+async def who_got_what(unstructured_data: str) -> SharedItem: 
     """
     gets the unstructured data from the user and then maps the people who shared 
     one particular item 
@@ -34,16 +36,6 @@ def who_got_what(unstructured_data: str) -> SharedItem:
     :rtype: IndividualSplit
     """
 
-    shared_items = get_oai_response("get_shared_item") 
+    shared_items = await get_oai_response("get_shared_item") 
 
-    price_calculator = price_calculator(shared_items)
-
-    
-
-
-
-
-
-
-
-
+    return shared_items
