@@ -2,7 +2,7 @@ import os
 from typing import Dict 
 from dotenv import load_dotenv 
 from openai import OpenAI
-from .types import ItemizedReciept, SharedItem
+from models import ItemizedReciept, SharedItem
 
 load_dotenv()
 oai_api_key = os.getenv("OPENAI_API_KEY")
