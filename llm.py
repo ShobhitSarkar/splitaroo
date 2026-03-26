@@ -1,5 +1,5 @@
 import os 
-from typing import Dict 
+from typing import Any, Dict 
 from dotenv import load_dotenv 
 from openai import OpenAI
 from models import ItemizedReciept, SharedItem
@@ -31,7 +31,7 @@ USAGE_SITUATION_FLAGS = {
     "get_shared_item" :  SharedItem 
 }
 
-async def get_oai_response(usage_situation_flag: int) -> ItemizedReciept | SharedItem: 
+async def get_oai_response(usage_situation_flag: int, router_content: Any) -> ItemizedReciept | SharedItem: 
     """
     situation 1: picture of the receipt to the itemized data 
     situation 2: turning unstructured who-got-what into shared item shape 
@@ -57,17 +57,19 @@ async def get_oai_response(usage_situation_flag: int) -> ItemizedReciept | Share
         output_model = USAGE_SITUATION_FLAGS["get_shared_item"]
 
     response = client.responses.parse(
-        model="gpt-4o-2024-08-06",
-        input=[
-            {"role": "system", "content": system_prompt},
-            {
-                "role": "user",
-                "content": "",
-            },
-        ],
-        text_format=output_model,
+        model="gpt-5",
+        input=system_prompt,
+        reasoning={"effort": "low"},
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "SharedItem",
+                # "strict": True,
+                "schema": output_model.model_json_schema()
+            }
+        }, 
     )
 
-    final_result = response.output_parsed
+    print(response.output_parsed)
 
-    return final_result
+    final_result = response.output_parsed
