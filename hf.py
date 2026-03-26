@@ -3,35 +3,63 @@ import base64
 from typing import Any
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
-
-
+from models import ItemizedReciept, SharedItem
 
 load_dotenv()
 hf_key = os.getenv('HF_TOKEN')
 
-async def get_hf_client(image: Any) -> Any: 
+client = InferenceClient(
+    api_key=hf_key,
+)
+
+ITEMIZED_RECIEPT_PROMPT = f"""
+Your are an expert reciept - analyzer system. You are given the picture of an itemized reciept. Look at the reciept and identify the items bought and their prices. 
+After you've gotten the items and prices. Your role is to identify the items and their prices in the picture of 
+the reciept. Make sure to only output the items and prices that you see in the picture, it is CRUCIAL that 
+you do so. Include the name of the item AND it's price both. 
+"""
+
+PER_ITEM_SPLIT_PROMPT = f"""
+Your role is to take all of the unstructured data input about which people got 
+which item and then turn it into the SharedItem structure. In the SharedItem 
+structure, the item is the thing itself and the people list are the people who shared 
+that item. 
+
+For example, if get an input like "bob and alice got the burger" the data is going to 
+look like \item: "burger", people: ["Sam", "Alex"]
+"""
+
+USAGE_SITUATION_FLAGS = {
+    "get_itemized_reciept" : ItemizedReciept,
+    "get_shared_item" :  SharedItem 
+}
+
+async def get_hf_client_image(image: bytes) -> Any: 
     
-        
-    client = InferenceClient(
-        api_key=hf_key,
-    )
+    image_bytes = image 
 
-    # Suppose your router gives you raw image bytes
-    image_bytes = image  # however you get it
-
-    # Encode to base64 data URI
     base64_image = base64.b64encode(image_bytes).decode("utf-8")
     image_url = f"data:image/png;base64,{base64_image}"
 
-    completion = client.chat.completions.create(
+    response_format = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "ItemizedReciept",
+            "schema": ItemizedReciept.model_json_schema(),
+            "strict": True,
+        },
+    }
+
+    response = client.chat.completions.create(
         model="Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic",
+        response_format=response_format,
         messages=[
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": "Tell me the items in the reciept and how much each costs."
+                        "text": ITEMIZED_RECIEPT_PROMPT
                     },
                     {
                         "type": "image_url",
@@ -44,4 +72,6 @@ async def get_hf_client(image: Any) -> Any:
         ],
     )
 
-    print(completion.choices[0].message)
+    print(response.choices[0].message.content)
+
+    return response.choices[0].message.content
