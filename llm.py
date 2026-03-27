@@ -31,7 +31,7 @@ USAGE_SITUATION_FLAGS = {
     "get_shared_item" :  SharedItem 
 }
 
-async def get_oai_response(usage_situation_flag: int, router_content: Any) -> ItemizedReciept | SharedItem: 
+async def get_oai_response(usage_situation_flag: str, router_content: Any) -> ItemizedReciept | SharedItem: 
     """
     situation 1: picture of the receipt to the itemized data 
     situation 2: turning unstructured who-got-what into shared item shape 
@@ -45,7 +45,7 @@ async def get_oai_response(usage_situation_flag: int, router_content: Any) -> It
     """
 
     if usage_situation_flag not in USAGE_SITUATION_FLAGS: 
-        return Exception("Wrong usage situation flag")
+        raise Exception("Wrong usage situation flag")
     
     
     if usage_situation_flag == "get_itemized_reciept": 
@@ -58,18 +58,36 @@ async def get_oai_response(usage_situation_flag: int, router_content: Any) -> It
 
     response = client.responses.parse(
         model="gpt-5",
-        input=system_prompt,
+        # input=system_prompt,
         reasoning={"effort": "low"},
         text={
             "format": {
                 "type": "json_schema",
-                "name": "SharedItem",
+                "name": "ItemizedReciept",
                 # "strict": True,
                 "schema": output_model.model_json_schema()
             }
         }, 
+        input=[
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_image",
+                        "image_url": router_content
+                    },
+                    {
+                        "type": "input_text",
+                        "text": ""
+                    }
+                ],
+            },
+        ]
     )
 
-    print(response.output_parsed)
 
-    final_result = response.output_parsed
+    return response.output[1].content[0].parsed

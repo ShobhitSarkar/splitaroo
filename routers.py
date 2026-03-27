@@ -1,16 +1,16 @@
 """
 implementation of the routers connecting to the frontend 
 """
-from typing import List, Dict, Annotated
+import base64
+from typing import List, Dict, Annotated, Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from hf import get_hf_client_image
-from models import ItemizedReciept, SharedItem
 from llm import get_oai_response
+from models import ItemizedReciept, SharedItem
 
 router = APIRouter(prefix="/receipt")
 
 @router.post("/uploadReciept")
-async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept | None: 
+async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept | Any: 
     """
     get an image of the reciept and turn it into an 
     itemized reciept shape 
@@ -21,11 +21,21 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept | None:
     :rtype: ItemizedReciept
     """
     
-    file_bytes = await file.read() 
+    file_bytes = await file.read()
 
-    print(type(file_bytes))
+    ## encode image 
+    image_encoded = base64.b64encode(file_bytes).decode("utf-8") 
 
-    itemized_reciept = await get_hf_client_image(file_bytes)
+    mime_type = file.content_type
+
+    ## build uri 
+    image_uri = f"data:{mime_type};base64,{image_encoded}"
+
+    print(image_uri)
+
+    itemized_reciept = await get_oai_response("get_itemized_reciept", image_uri)
+
+    print(itemized_reciept)
 
     return itemized_reciept
     
@@ -42,6 +52,6 @@ async def who_got_what(unstructured_data: str) -> SharedItem:
     :rtype: IndividualSplit
     """
 
-    shared_items = await get_oai_response("get_shared_item", unstructured_data) 
+    # shared_items = await get_oai_response("get_shared_item", unstructured_data) 
 
-    return shared_items
+    pass

@@ -3,7 +3,7 @@ import base64
 from typing import Any
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
-from models import ItemizedReciept, SharedItem
+from models import ItemizedReciept, SharedItem, Item
 
 load_dotenv()
 hf_key = os.getenv('HF_TOKEN')
@@ -16,7 +16,7 @@ ITEMIZED_RECIEPT_PROMPT = f"""
 Your are an expert reciept - analyzer system. You are given the picture of an itemized reciept. Look at the reciept and identify the items bought and their prices. 
 After you've gotten the items and prices. Your role is to identify the items and their prices in the picture of 
 the reciept. Make sure to only output the items and prices that you see in the picture, it is CRUCIAL that 
-you do so. Include the name of the item AND it's price both. 
+you do so. Include the name of the item AND it's price both.
 """
 
 PER_ITEM_SPLIT_PROMPT = f"""
@@ -44,34 +44,36 @@ async def get_hf_client_image(image: bytes) -> Any:
     response_format = {
         "type": "json_schema",
         "json_schema": {
-            "name": "ItemizedReciept",
+            "name": "Item",
             "schema": ItemizedReciept.model_json_schema(),
             "strict": True,
         },
     }
 
-    response = client.chat.completions.create(
-        model="Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic",
-        response_format=response_format,
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": ITEMIZED_RECIEPT_PROMPT
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": image_url
+    try: 
+        response = client.chat.completions.create(
+            model="Qwen/Qwen2.5-VL-7B-Instruct:hyperbolic",
+            response_format=response_format,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": ITEMIZED_RECIEPT_PROMPT
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": image_url
+                            }
                         }
-                    }
-                ]
-            }
-        ],
-    )
-
-    print(response.choices[0].message.content)
-
-    return response.choices[0].message.content
+                    ]
+                }
+            ],
+        )
+        print(response.choices[0].message.content)
+        return response.choices[0].message.content
+    except Exception as e: 
+        print("An exception occured while calling llm:", e)
+    

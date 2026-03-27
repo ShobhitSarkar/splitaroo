@@ -1,10 +1,12 @@
 from typing import List
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class Item(BaseModel): 
     """
     item of an itemized reciept 
     """
+    model_config = ConfigDict(extra="forbid")
+
     name: str
     price: float 
 
@@ -12,6 +14,8 @@ class ItemizedReciept(BaseModel):
     """
     shape of reciept 
     """
+    model_config = ConfigDict(extra="forbid")
+    
     receipt: List[Item]
 
 
