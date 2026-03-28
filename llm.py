@@ -55,13 +55,11 @@ async def get_oai_response(usage_situation_flag: str, router_content: Any) -> It
         try: 
             response = client.responses.parse(
                 model="gpt-5",
-                # input=system_prompt,
                 reasoning={"effort": "low"},
                 text={
                     "format": {
                         "type": "json_schema",
                         "name": "ItemizedReciept",
-                        # "strict": True,
                         "schema": output_model.model_json_schema()
                     }
                 }, 
