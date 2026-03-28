@@ -22,18 +22,11 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept | Any:
     """
     
     file_bytes = await file.read()
-
-    ## encode image 
     image_encoded = base64.b64encode(file_bytes).decode("utf-8") 
-
     mime_type = file.content_type
-
-    ## build uri 
     image_uri = f"data:{mime_type};base64,{image_encoded}"
 
     itemized_reciept = await get_oai_response("get_itemized_reciept", image_uri)
-
-    print(itemized_reciept)
 
     return itemized_reciept
     

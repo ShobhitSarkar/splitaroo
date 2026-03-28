@@ -52,46 +52,58 @@ async def get_oai_response(usage_situation_flag: str, router_content: Any) -> It
         system_prompt = ITEMIZED_RECIEPT_PROMPT
         output_model = USAGE_SITUATION_FLAGS["get_itemized_reciept"]
 
+        try: 
+            response = client.responses.parse(
+                model="gpt-5",
+                # input=system_prompt,
+                reasoning={"effort": "low"},
+                text={
+                    "format": {
+                        "type": "json_schema",
+                        "name": "ItemizedReciept",
+                        # "strict": True,
+                        "schema": output_model.model_json_schema()
+                    }
+                }, 
+                input=[
+                    {
+                        "role": "system",
+                        "content": system_prompt,
+                    },
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_image",
+                                "image_url": router_content
+                            },
+                            {
+                                "type": "input_text",
+                                "text": ""
+                            }
+                        ],
+                    },
+                ]
+            )
+
+            response_object = response.output[1].content[0].text
+
+            result = ItemizedReciept.model_validate_json(response_object)
+        
+        except Exception as e: 
+            raise Exception(f"Something is going wrong: {e}")
+        
+    
+
     if usage_situation_flag == "get_shared_item":
         system_prompt = PER_ITEM_SPLIT_PROMPT
         output_model = USAGE_SITUATION_FLAGS["get_shared_item"]
 
-    response = client.responses.parse(
-        model="gpt-5",
-        # input=system_prompt,
-        reasoning={"effort": "low"},
-        text={
-            "format": {
-                "type": "json_schema",
-                "name": "ItemizedReciept",
-                # "strict": True,
-                "schema": output_model.model_json_schema()
-            }
-        }, 
-        input=[
-            {
-                "role": "system",
-                "content": system_prompt,
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "input_image",
-                        "image_url": router_content
-                    },
-                    {
-                        "type": "input_text",
-                        "text": ""
-                    }
-                ],
-            },
-        ]
-    )
 
-    response_object = response.output[1].content[0].text
+    
+    return result 
 
-    final_reciept = ItemizedReciept.model_validate_json(response_object)
+    
 
 
-    return final_reciept
+    
