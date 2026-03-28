@@ -89,5 +89,9 @@ async def get_oai_response(usage_situation_flag: str, router_content: Any) -> It
         ]
     )
 
+    response_object = response.output[1].content[0].text
 
-    return response.output[1].content[0].parsed
+    final_reciept = ItemizedReciept.model_validate_json(response_object)
+
+
+    return final_reciept
