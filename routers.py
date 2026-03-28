@@ -5,7 +5,7 @@ import base64
 from typing import List, Dict, Annotated, Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
 from llm import get_oai_response
-from models import ItemizedReciept, SharedItem
+from models import ItemizedReciept, SplitBreakdown
 
 router = APIRouter(prefix="/receipt")
 
@@ -32,7 +32,7 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept | Any:
     
 
 @router.post("/unstructuredData")
-async def who_got_what(unstructured_data: str) -> SharedItem: 
+async def who_got_what(unstructured_data: str) -> SplitBreakdown: 
     """
     gets the unstructured data from the user and then maps the people who shared 
     one particular item 
@@ -43,6 +43,6 @@ async def who_got_what(unstructured_data: str) -> SharedItem:
     :rtype: IndividualSplit
     """
 
-    # shared_items = await get_oai_response("get_shared_item", unstructured_data) 
+    per_person_split = await get_oai_response("get_shared_item", unstructured_data)
 
-    pass
+    return per_person_split

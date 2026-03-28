@@ -23,6 +23,9 @@ class SharedItem(BaseModel):
     """
     each item and the people who shared it 
     """
+
+    model_config = ConfigDict(extra="forbid")
+
     item: str 
     people: List[str]
 
@@ -30,6 +33,9 @@ class SplitBreakdown(BaseModel):
     """
     Record which person got which item 
     """
+
+    model_config = ConfigDict(extra="forbid")
+    
     items: List[SharedItem]
 
 
