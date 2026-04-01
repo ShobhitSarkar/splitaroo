@@ -2,7 +2,7 @@
 implementation of the routers connecting to the frontend 
 """
 import base64
-from typing import List, Dict, Annotated, Any
+from typing import Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
 from llm import get_oai_response
 from models import ItemizedReciept, SplitBreakdown
