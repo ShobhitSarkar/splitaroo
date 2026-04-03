@@ -21,28 +21,27 @@ def split_calculator() -> Any:
     itemized_reciept = itemized_reciept_sample()
     split_breakdown = split_breakdown_sample() 
 
-    print("---------- this is the split breakdown----------")
-    
-    # print(split_breakdown)
+    reciept_dict = {} 
+    people_dict = {} 
 
-    for thing in split_breakdown.items: 
-        for item in itemized_reciept.receipt: 
-            if thing == item: 
-                print(f"FOUND CORRESPONDING ITEM: {thing}, {item}")
-                
-        
-        # print(thing.item)
-        
-    
-    
-    # print("------------ this is the itemized reciept -------------------")    
-    # for item in itemized_reciept.receipt:
-        
-    
-    #     print(item.name)
-    
+    ## building the reciept dictionary
+    for item in itemized_reciept.receipt: 
+        reciept_dict[item.name] = item.price
 
-    return None 
+    ## building the people dictionary 
+    for shared_item in split_breakdown.items: 
+        for person in shared_item.people: 
+            people_dict[person] = 0
+
+    ## meat of the problem 
+    for shared_item in split_breakdown.items: 
+        if shared_item.item in reciept_dict: 
+            cost_per_person = reciept_dict[shared_item.item] / len(shared_item.people)
+
+            for person in shared_item.people: 
+                people_dict[person] += cost_per_person
+
+    
 
 split_calculator()
     
