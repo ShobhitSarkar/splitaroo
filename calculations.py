@@ -2,7 +2,7 @@ from typing import Any
 from models import ItemizedReciept, SplitBreakdown
 from sample_responses import itemized_reciept_sample, split_breakdown_sample
 
-def split_calculator() -> Any: 
+def split_calculator(itemized_reciept: ItemizedReciept, split_breakdown: SplitBreakdown) -> dict: 
     """
     for every item in the itemized reciept: 
         - see whether it exists in the split 
@@ -17,9 +17,6 @@ def split_calculator() -> Any:
             who_got_what so that the items line up 
 
     """
-
-    itemized_reciept = itemized_reciept_sample()
-    split_breakdown = split_breakdown_sample() 
 
     reciept_dict = {} 
     people_dict = {} 
@@ -41,9 +38,7 @@ def split_calculator() -> Any:
             for person in shared_item.people: 
                 people_dict[person] += cost_per_person
 
-    
-
-split_calculator()
+    return people_dict
     
 
     

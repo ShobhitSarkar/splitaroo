@@ -39,21 +39,5 @@ class SplitBreakdown(BaseModel):
     items: List[SharedItem]
 
 
-class PerPersonSplit(BaseModel): 
-    """
-    Final per person split 
-    """
-    person: str 
-    amount: int 
-
-class FinalSplit(BaseModel): 
-    """
-    The final split of the entire bill 
-    """
-    
-    split: List[PerPersonSplit]
-
-
-
 
     
