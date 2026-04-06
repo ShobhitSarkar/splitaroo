@@ -1,6 +1,5 @@
 from typing import Any
-from models import ItemizedReciept, SplitBreakdown
-from sample_responses import itemized_reciept_sample, split_breakdown_sample
+from app.schemas.models import ItemizedReciept, SplitBreakdown
 
 def split_calculator(itemized_reciept: ItemizedReciept, split_breakdown: SplitBreakdown) -> dict: 
     """

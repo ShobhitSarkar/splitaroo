@@ -2,7 +2,7 @@ import os
 from typing import Any, Dict 
 from dotenv import load_dotenv 
 from openai import OpenAI
-from models import ItemizedReciept, SplitBreakdown
+from app.schemas.models import ItemizedReciept, SplitBreakdown
 
 load_dotenv()
 oai_api_key = os.getenv("OPENAI_API_KEY")
