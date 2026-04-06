@@ -1,7 +1,7 @@
 from typing import List, Dict
 from fastapi import FastAPI
 from pydantic import BaseModel
-from routers import router
+from app.api.routes.routers import router
 
 app = FastAPI() 
 

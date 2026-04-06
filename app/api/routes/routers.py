@@ -4,9 +4,9 @@ implementation of the routers connecting to the frontend
 import base64
 from typing import Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from llm import get_oai_response
-from models import ItemizedReciept, SplitBreakdown
-from calculations import split_calculator
+from app.core.llm import get_oai_response
+from app.schemas.models import ItemizedReciept, SplitBreakdown
+from app.core.calculations import split_calculator
 
 router = APIRouter(prefix="/receipt")
 
