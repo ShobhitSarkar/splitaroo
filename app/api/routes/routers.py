@@ -65,3 +65,7 @@ async def get_reciept_details(customer_reciept : ItemizedReciept, customer_split
     final_split = split_calculator(customer_reciept, customer_split_breakdown) 
 
     return final_split
+
+
+
+    

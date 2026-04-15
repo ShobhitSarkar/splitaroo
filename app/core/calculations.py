@@ -3,17 +3,9 @@ from app.schemas.models import ItemizedReciept, SplitBreakdown
 
 def split_calculator(itemized_reciept: ItemizedReciept, split_breakdown: SplitBreakdown) -> dict: 
     """
-    for every item in the itemized reciept: 
-        - see whether it exists in the split 
-        - if it does exist in the split, see how many people split it
-        - get the cost of the item from the itemized reciept 
-        - split it by the number of people that got it 
+    meat of the splitting algorithm 
 
-        - for something to think about: 
-            - if items from itemized reciept doesn't exist in the 
-            who_got_what part 
-            - we might need to pass the itemized_reciept to the 
-            who_got_what so that the items line up 
+    takes in an itemized reciept, who got what and then returns the per person split 
 
     """
 
