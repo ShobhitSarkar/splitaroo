@@ -1,11 +1,39 @@
 import os 
+import boto3 
+from botocore.exceptions import ClientError
 from typing import Any, Dict 
 from dotenv import load_dotenv 
 from openai import OpenAI
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 
-load_dotenv()
-oai_api_key = os.getenv("OPENAI_API_KEY")
+def get_oai_api_key():
+
+    secret_name = "OPENAI_API_KEY"
+    region_name = "us-east-2"
+
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        raise e
+
+    oai_api_key = get_secret_value_response['SecretString']
+
+    return oai_api_key
+
+
+# load_dotenv()
+
+
+oai_api_key = get_oai_api_key()
+
 
 client = OpenAI(api_key=oai_api_key) 
 
