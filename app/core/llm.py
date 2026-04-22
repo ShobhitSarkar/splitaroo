@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 
+## TODO: This is unused right now.
 def get_oai_api_key():
 
     secret_name = "OPENAI_API_KEY"
@@ -29,10 +30,11 @@ def get_oai_api_key():
     return oai_api_key
 
 
-# load_dotenv()
+load_dotenv()
 
+oai_api_key = os.getenv("OPENAI_API_KEY")
 
-oai_api_key = get_oai_api_key()
+# oai_api_key = get_oai_api_key()
 
 
 client = OpenAI(api_key=oai_api_key) 
@@ -158,6 +160,23 @@ async def get_oai_response(usage_situation_flag: str, router_content: str) -> It
             raise Exception(f"Something went wrong: {e}")
         
     return result 
+
+async def get_stt(contents, file_name) -> str: 
+    """
+    Transcribes a given audio file into text
+    
+    :param contents: the file bytes 
+    :param file_name: name of the file 
+    :return: transcribed message 
+    :rtype: str
+    """
+
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=(file_name, contents),
+    )
+
+    return transcription.text
 
     
 
