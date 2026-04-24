@@ -243,6 +243,7 @@ async def guardrail_llm(content: Any, usage_situation: str) -> bool:
     :rtype: bool
     """
     
+    # TODO: Need to update this so that the llm can read the image.
     if usage_situation == "upload_reciept":
         system_prompt = UPLOAD_RECIEPT_PROMPT
 
@@ -254,6 +255,7 @@ async def guardrail_llm(content: Any, usage_situation: str) -> bool:
     
     output_model = GuardRailDecision
     
+    ## TODO: Need to wrap the input between <user_input><user_input/>
     try: 
         response = client.responses.parse(
             model="gpt-5",
@@ -288,5 +290,5 @@ async def guardrail_llm(content: Any, usage_situation: str) -> bool:
 
     result = GuardRailDecision.model_validate_json(response_object)
 
-    return result 
+    return result.allow
     
