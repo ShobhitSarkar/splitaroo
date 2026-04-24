@@ -4,7 +4,7 @@ implementation of the routers connecting to the frontend
 import base64
 from typing import Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from app.core.llm import get_oai_response, get_stt
+from app.core.llm import get_oai_response, get_stt, guardrail_llm
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 from app.core.calculations import split_calculator
 
@@ -27,7 +27,12 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept:
     mime_type = file.content_type
     image_uri = f"data:{mime_type};base64,{image_encoded}"
 
-    itemized_reciept = await get_oai_response("get_itemized_reciept", image_uri)
+    guardrail_check = await guardrail_llm(image_uri, "upload_reciept")
+
+    if guardrail_check == False: 
+        raise Exception("The given input is malicious. Try again later.")
+    else: 
+        itemized_reciept = await get_oai_response("get_itemized_reciept", image_uri)
 
     return itemized_reciept
     
@@ -44,7 +49,12 @@ async def who_got_what(unstructured_data: str) -> None:
     :rtype: IndividualSplit
     """
 
-    per_person_split = await get_oai_response("get_shared_item", unstructured_data)
+    guardrail_check = await guardrail_llm(unstructured_data, "unstructured_data"): 
+    
+    if guardrail_check == False: 
+        raise Exception("The given input is malicious. Please try again.")
+    else: 
+        per_person_split = await get_oai_response("get_shared_item", unstructured_data)
 
     return per_person_split
 
@@ -85,6 +95,11 @@ async def get_voice_breakdown(audio_file: UploadFile = File(...)) -> str:
     file_name = audio_file.filename
     contents = await audio_file.read() 
 
-    transcribed_text = await get_stt(contents, file_name)
+    guardrail_check = await guardrail_llm(contents, "voice_breakdown"): 
+
+    if guardrail_check == False: 
+        raise Exception("The given input is malicious. Try again later.")
+    else: 
+        transcribed_text = await get_stt(contents, file_name)
 
     return transcribed_text
