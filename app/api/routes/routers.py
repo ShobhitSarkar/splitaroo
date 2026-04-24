@@ -4,7 +4,7 @@ implementation of the routers connecting to the frontend
 import base64
 from typing import Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from app.core.llm import get_oai_response
+from app.core.llm import get_oai_response, get_stt
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 from app.core.calculations import split_calculator
 
@@ -66,6 +66,25 @@ async def get_reciept_details(customer_reciept : ItemizedReciept, customer_split
 
     return final_split
 
-
-
+@router.post("/stt")
+async def get_voice_breakdown(audio_file: UploadFile = File(...)) -> str:
+    """
+    Gets the audio from the frontend and returns the transcription. 
+    This transcription is then going to be used by the who_got_what endpoint 
+    for the rest of the flow 
     
+    :param audio_file: user speech 
+    :type audio_file: UploadFile (File object)
+    :return: transcription
+    :rtype: str
+    """
+
+    if audio_file.content_type != "audio/mpeg": 
+        return "Wrong file type supplied."
+    
+    file_name = audio_file.filename
+    contents = await audio_file.read() 
+
+    transcribed_text = await get_stt(contents, file_name)
+
+    return transcribed_text
