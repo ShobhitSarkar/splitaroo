@@ -5,7 +5,7 @@ import base64
 from typing import Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
 from app.core.llm import get_oai_response, get_stt
-from app.core.guardrails import guardrail_llm
+from app.core.guardrails import guardrail_image, guardrail_text
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 from app.core.calculations import split_calculator
 
@@ -28,7 +28,7 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept:
     mime_type = file.content_type
     image_uri = f"data:{mime_type};base64,{image_encoded}"
 
-    guardrail_check = await guardrail_llm(image_uri, "upload_reciept")
+    guardrail_check = await guardrail_image(image_uri)
 
     if guardrail_check == False: 
         raise Exception("The given input is malicious. Try again later.")
@@ -50,7 +50,7 @@ async def who_got_what(unstructured_data: str) -> None:
     :rtype: IndividualSplit
     """
 
-    guardrail_check = await guardrail_llm(unstructured_data, "unstructured_data")
+    guardrail_check = await guardrail_text(unstructured_data)
     
     if guardrail_check == False: 
         raise Exception("The given input is malicious. Please try again.")
@@ -101,7 +101,7 @@ async def get_voice_breakdown(audio_file: UploadFile = File(...)) -> str:
     else: 
         transcribed_text = await get_stt(contents, file_name)
 
-        guardrail_check = await guardrail_llm(transcribed_text, "voice_breakdown") 
+        guardrail_check = await guardrail_text(transcribed_text) 
 
         if guardrail_check == False: 
             raise Exception("Malicious input detected.")
