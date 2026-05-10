@@ -31,7 +31,7 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept:
     guardrail_check = await guardrail_image(image_uri)
 
     if guardrail_check == False: 
-        raise Exception("The given input is malicious. Try again later.")
+        raise Exception("The given input is malicious / inappropriate.")
     else: 
         itemized_reciept = await get_oai_response("get_itemized_reciept", image_uri)
 
@@ -53,7 +53,7 @@ async def who_got_what(unstructured_data: str) -> None:
     guardrail_check = await guardrail_text(unstructured_data)
     
     if guardrail_check == False: 
-        raise Exception("The given input is malicious. Please try again.")
+        raise Exception("The given input is malicious / inappropriate.")
     else: 
         per_person_split = await get_oai_response("get_shared_item", unstructured_data)
 
@@ -96,15 +96,13 @@ async def get_voice_breakdown(audio_file: UploadFile = File(...)) -> str:
     file_name = audio_file.filename
     contents = await audio_file.read() 
 
+
+    transcribed_text = await get_stt(contents, file_name)
+
+    guardrail_check = await guardrail_text(transcribed_text) 
+
     if guardrail_check == False: 
-        raise Exception("The given input is malicious. Try again later.")
-    else: 
-        transcribed_text = await get_stt(contents, file_name)
-
-        guardrail_check = await guardrail_text(transcribed_text) 
-
-        if guardrail_check == False: 
-            raise Exception("Malicious input detected.")
+        raise Exception("Malicious input detected.")
         
 
     return transcribed_text
