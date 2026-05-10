@@ -4,7 +4,8 @@ implementation of the routers connecting to the frontend
 import base64
 from typing import Any
 from fastapi import FastAPI, File, UploadFile, APIRouter
-from app.core.llm import get_oai_response, get_stt, guardrail_llm
+from app.core.llm import get_oai_response, get_stt
+from app.core.guardrails import guardrail_llm
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 from app.core.calculations import split_calculator
 
@@ -49,7 +50,7 @@ async def who_got_what(unstructured_data: str) -> None:
     :rtype: IndividualSplit
     """
 
-    guardrail_check = await guardrail_llm(unstructured_data, "unstructured_data"): 
+    guardrail_check = await guardrail_llm(unstructured_data, "unstructured_data")
     
     if guardrail_check == False: 
         raise Exception("The given input is malicious. Please try again.")
@@ -95,11 +96,15 @@ async def get_voice_breakdown(audio_file: UploadFile = File(...)) -> str:
     file_name = audio_file.filename
     contents = await audio_file.read() 
 
-    guardrail_check = await guardrail_llm(contents, "voice_breakdown"): 
-
     if guardrail_check == False: 
         raise Exception("The given input is malicious. Try again later.")
     else: 
         transcribed_text = await get_stt(contents, file_name)
+
+        guardrail_check = await guardrail_llm(transcribed_text, "voice_breakdown") 
+
+        if guardrail_check == False: 
+            raise Exception("Malicious input detected.")
+        
 
     return transcribed_text
