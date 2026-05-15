@@ -8,4 +8,7 @@ run-image:
 	docker run splitaroo-api
 
 lint: 
+	black . --check
+
+fix-lint: 
 	black . 
