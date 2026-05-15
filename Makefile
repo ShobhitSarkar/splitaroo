@@ -6,3 +6,6 @@ build-image:
 
 run-image: 
 	docker run splitaroo-api
+
+lint: 
+	black . 
