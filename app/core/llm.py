@@ -176,4 +176,3 @@ async def get_stt(contents, file_name) -> str:
     )
 
     return transcription.text
-

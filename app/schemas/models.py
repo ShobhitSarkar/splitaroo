@@ -47,4 +47,3 @@ class GuardRailDecision(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     allow: bool
-
