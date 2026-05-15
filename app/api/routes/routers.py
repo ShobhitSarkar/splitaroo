@@ -39,7 +39,7 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept:
     
 
 @router.post("/unstructuredData")
-async def who_got_whatdo(unstructured_data: str) -> None: 
+async def who_got_what(unstructured_data: str) -> None: 
     """
     gets the unstructured data from the user and then maps the people who shared 
     one particular item 
