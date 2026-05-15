@@ -1,42 +1,48 @@
 from typing import List
 from pydantic import BaseModel, ConfigDict
 
-class Item(BaseModel): 
+
+class Item(BaseModel):
     """
-    item of an itemized reciept 
+    item of an itemized reciept
     """
+
     model_config = ConfigDict(extra="forbid")
 
     name: str
-    price: float 
+    price: float
 
-class ItemizedReciept(BaseModel): 
+
+class ItemizedReciept(BaseModel):
     """
-    shape of reciept 
+    shape of reciept
     """
+
     model_config = ConfigDict(extra="forbid")
-    
+
     receipt: List[Item]
 
 
-class SharedItem(BaseModel): 
+class SharedItem(BaseModel):
     """
-    each item and the people who shared it 
+    each item and the people who shared it
     """
 
     model_config = ConfigDict(extra="forbid")
 
-    item: str 
+    item: str
     people: List[str]
 
-class SplitBreakdown(BaseModel): 
+
+class SplitBreakdown(BaseModel):
     """
-    Record which person got which item 
+    Record which person got which item
     """
 
     model_config = ConfigDict(extra="forbid")
-    
+
     items: List[SharedItem]
+
 
 class GuardRailDecision(BaseModel):
     """

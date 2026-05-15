@@ -1,9 +1,10 @@
-import os 
-import boto3 
+import os
+import boto3
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 from openai import OpenAI
 from app.schemas.models import ItemizedReciept, SplitBreakdown
+
 
 ## TODO: This is unused right now.
 def get_oai_api_key():
@@ -12,19 +13,14 @@ def get_oai_api_key():
     region_name = "us-east-2"
 
     session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name
-    )
+    client = session.client(service_name="secretsmanager", region_name=region_name)
 
     try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
+        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
     except ClientError as e:
         raise e
 
-    oai_api_key = get_secret_value_response['SecretString']
+    oai_api_key = get_secret_value_response["SecretString"]
 
     return oai_api_key
 
@@ -36,7 +32,7 @@ oai_api_key = os.getenv("OPENAI_API_KEY")
 # oai_api_key = get_oai_api_key()
 
 
-client = OpenAI(api_key=oai_api_key) 
+client = OpenAI(api_key=oai_api_key)
 
 ITEMIZED_RECIEPT_PROMPT = f"""
 Your are an expert reciept - analyzer system. You are given the picture of an itemized reciept. Look at the reciept and identify the items bought and their prices. 
@@ -58,32 +54,34 @@ look like \item: "burger", people: ["Sam", "Alex"]
 """
 
 USAGE_SITUATION_FLAGS = {
-    "get_itemized_reciept" : ItemizedReciept,
-    "get_shared_item" :  SplitBreakdown 
+    "get_itemized_reciept": ItemizedReciept,
+    "get_shared_item": SplitBreakdown,
 }
 
-async def get_oai_response(usage_situation_flag: str, router_content: str) -> ItemizedReciept | SplitBreakdown: 
+
+async def get_oai_response(
+    usage_situation_flag: str, router_content: str
+) -> ItemizedReciept | SplitBreakdown:
     """
-    situation 1: picture of the receipt to the itemized data 
-    situation 2: turning unstructured who-got-what into shared item shape 
-    
-    :param usage_situation_flag: situation_1 or situation_2 
+    situation 1: picture of the receipt to the itemized data
+    situation 2: turning unstructured who-got-what into shared item shape
+
+    :param usage_situation_flag: situation_1 or situation_2
     :type usage_situation_flag: int
     :param output_shape: 1 for ItemizedReciept, 2 for SplitBreakdown
-    :type output_shape: int, 1 for ItemizedReciept, 2 for SplitBreakdown 
-    :return: Structured Data 
-    :rtype: ItemizedReciept | SplitBreakdown 
+    :type output_shape: int, 1 for ItemizedReciept, 2 for SplitBreakdown
+    :return: Structured Data
+    :rtype: ItemizedReciept | SplitBreakdown
     """
 
-    if usage_situation_flag not in USAGE_SITUATION_FLAGS: 
+    if usage_situation_flag not in USAGE_SITUATION_FLAGS:
         raise Exception("Wrong usage situation flag")
-    
-    
-    if usage_situation_flag == "get_itemized_reciept": 
+
+    if usage_situation_flag == "get_itemized_reciept":
         system_prompt = ITEMIZED_RECIEPT_PROMPT
         output_model = USAGE_SITUATION_FLAGS["get_itemized_reciept"]
 
-        try: 
+        try:
             response = client.responses.parse(
                 model="gpt-5",
                 reasoning={"effort": "low"},
@@ -91,9 +89,9 @@ async def get_oai_response(usage_situation_flag: str, router_content: str) -> It
                     "format": {
                         "type": "json_schema",
                         "name": "ItemizedReciept",
-                        "schema": output_model.model_json_schema()
+                        "schema": output_model.model_json_schema(),
                     }
-                }, 
+                },
                 input=[
                     {
                         "role": "system",
@@ -102,28 +100,24 @@ async def get_oai_response(usage_situation_flag: str, router_content: str) -> It
                     {
                         "role": "user",
                         "content": [
-                            {
-                                "type": "input_image",
-                                "image_url": router_content
-                            },
+                            {"type": "input_image", "image_url": router_content},
                         ],
                     },
-                ]
+                ],
             )
 
             response_object = response.output[1].content[0].text
 
             result = ItemizedReciept.model_validate_json(response_object)
-        
-        except Exception as e: 
+
+        except Exception as e:
             raise Exception(f"Something is going wrong: {e}")
-        
-    
+
     if usage_situation_flag == "get_shared_item":
         system_prompt = PER_ITEM_SPLIT_PROMPT
         output_model = USAGE_SITUATION_FLAGS["get_shared_item"]
 
-        try: 
+        try:
             response = client.responses.parse(
                 model="gpt-5",
                 reasoning={"effort": "low"},
@@ -131,9 +125,9 @@ async def get_oai_response(usage_situation_flag: str, router_content: str) -> It
                     "format": {
                         "type": "json_schema",
                         "name": "SplitBreakdown",
-                        "schema": output_model.model_json_schema()
+                        "schema": output_model.model_json_schema(),
                     }
-                }, 
+                },
                 input=[
                     {
                         "role": "system",
@@ -142,31 +136,29 @@ async def get_oai_response(usage_situation_flag: str, router_content: str) -> It
                     {
                         "role": "user",
                         "content": [
-                            {
-                                "type": "input_text",
-                                "text": router_content
-                            },
+                            {"type": "input_text", "text": router_content},
                         ],
                     },
-                ]
+                ],
             )
 
             response_object = response.output[1].content[0].text
 
             result = SplitBreakdown.model_validate_json(response_object)
-        
-        except Exception as e: 
-            raise Exception(f"Something went wrong: {e}")
-        
-    return result 
 
-async def get_stt(contents, file_name) -> str: 
+        except Exception as e:
+            raise Exception(f"Something went wrong: {e}")
+
+    return result
+
+
+async def get_stt(contents, file_name) -> str:
     """
     Transcribes a given audio file into text
-    
-    :param contents: the file bytes 
-    :param file_name: name of the file 
-    :return: transcribed message 
+
+    :param contents: the file bytes
+    :param file_name: name of the file
+    :return: transcribed message
     :rtype: str
     """
 

@@ -42,16 +42,16 @@ Respond with the structured schema only.
 
 oai_api_key = os.getenv("OPENAI_API_KEY")
 
-async def guardrail_image(image_uri : str) -> bool: 
 
+async def guardrail_image(image_uri: str) -> bool:
     """
-    LLM client for guardrails related to images 
-    
-    :return: Whether allowed or not 
+    LLM client for guardrails related to images
+
+    :return: Whether allowed or not
     :rtype: GuardRailDecision
     """
 
-    try: 
+    try:
         response = client.responses.parse(
             model="gpt-5",
             reasoning={"effort": "high"},
@@ -59,9 +59,9 @@ async def guardrail_image(image_uri : str) -> bool:
                 "format": {
                     "type": "json_schema",
                     "name": "GuardRailDecision",
-                    "schema": GuardRailDecision.model_json_schema()
+                    "schema": GuardRailDecision.model_json_schema(),
                 }
-            }, 
+            },
             input=[
                 {
                     "role": "system",
@@ -70,36 +70,33 @@ async def guardrail_image(image_uri : str) -> bool:
                 {
                     "role": "user",
                     "content": [
-                        {
-                            "type": "input_image",
-                            "image_url": image_uri
-                        },
+                        {"type": "input_image", "image_url": image_uri},
                     ],
                 },
-            ]
+            ],
         )
 
         response_object = response.output[1].content[0].text
 
         result = GuardRailDecision.model_validate_json(response_object)
-    
-    except Exception as e: 
+
+    except Exception as e:
         raise Exception(f"Something is going wrong: {e}")
-    
+
     return result.allow
 
-async def guardrail_text(content: str) -> bool: 
 
+async def guardrail_text(content: str) -> bool:
     """
-    Guardrail LLM check for text related content 
-    
-    :param content: the actual input content from the user 
+    Guardrail LLM check for text related content
+
+    :param content: the actual input content from the user
     :type content: str
-    :return: boolean basically allowing true or false 
+    :return: boolean basically allowing true or false
     :rtype: bool
     """
 
-    try: 
+    try:
         response = client.responses.parse(
             model="gpt-5",
             reasoning={"effort": "high"},
@@ -107,9 +104,9 @@ async def guardrail_text(content: str) -> bool:
                 "format": {
                     "type": "json_schema",
                     "name": "GuardRailDecision",
-                    "schema": GuardRailDecision.model_json_schema()
+                    "schema": GuardRailDecision.model_json_schema(),
                 }
-            }, 
+            },
             input=[
                 {
                     "role": "system",
@@ -118,23 +115,17 @@ async def guardrail_text(content: str) -> bool:
                 {
                     "role": "user",
                     "content": [
-                        {
-                            "type": "input_text",
-                            "text": content
-                        },
+                        {"type": "input_text", "text": content},
                     ],
                 },
-            ]
+            ],
         )
 
         response_object = response.output[1].content[0].text
 
         result = GuardRailDecision.model_validate_json(response_object)
-    
-    except Exception as e: 
+
+    except Exception as e:
         raise Exception(f"Something went wrong: {e}")
-    
+
     return result.allow
-
-
-
