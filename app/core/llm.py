@@ -1,8 +1,7 @@
 import os 
 import boto3 
 from botocore.exceptions import ClientError
-from typing import Any, Dict 
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 from openai import OpenAI
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 
@@ -47,14 +46,14 @@ you do so. Include the name of the item AND it's price both.
 """
 
 PER_ITEM_SPLIT_PROMPT = f"""
-Your role is to take all of the unstructured data input about which people got 
-which item and then turn it into the SplitBreakdown structure. In the SplitBreakdown 
-structure, the item is the thing itself and the people list are the people who shared 
-that item. Make sure to come back with all the items in the given data and who shared what. 
+Your role is to take all of the unstructured data input about which people got
+which item and then turn it into the SplitBreakdown structure. In the SplitBreakdown
+structure, the item is the thing itself and the people list are the people who shared
+that item. Make sure to come back with all the items in the given data and who shared what.
 
-It's crtical that you don't miss out on the items given to you. 
+It's crtical that you don't miss out on the items given to you.
 
-For example, if get an input like "bob and alice got the burger" the data is going to 
+For example, if get an input like "bob and alice got the burger" the data is going to
 look like \item: "burger", people: ["Sam", "Alex"]
 """
 
@@ -177,8 +176,3 @@ async def get_stt(contents, file_name) -> str:
     )
 
     return transcription.text
-
-    
-
-
-    
