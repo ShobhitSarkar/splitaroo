@@ -12,3 +12,9 @@ lint:
 
 fix-lint: 
 	black . 
+
+build-image: 
+	docker build
+
+run-image: 
+	docker run -p 8080:8080 splitaroo
