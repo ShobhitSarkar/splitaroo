@@ -38,10 +38,13 @@ class SplitBreakdown(BaseModel):
     
     items: List[SharedItem]
 
-class GuardRailDecision(BaseModel): 
+class GuardRailDecision(BaseModel):
     """
     Pydantic model to get more reliable decisions
-    from the guardrail llm 
+    from the guardrail llm
     """
-    
+
+    model_config = ConfigDict(extra="forbid")
+
     allow: bool
+

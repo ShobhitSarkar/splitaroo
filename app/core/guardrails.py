@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from typing import Any
 from app.core.llm import client
 from app.schemas.models import GuardRailDecision
@@ -37,6 +39,8 @@ Names of real or fictional people ("Bob", "Taylor Swift", "Gandalf") are fine. U
 
 Respond with the structured schema only.
 """
+
+oai_api_key = os.getenv("OPENAI_API_KEY")
 
 async def guardrail_image(image_uri : str) -> bool: 
 
