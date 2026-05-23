@@ -32,4 +32,4 @@ jobs:
 
     - name: lint
       run: |
-        source .venv/bin/activate && make lint
+        source .venv/bin/activate && make tests
