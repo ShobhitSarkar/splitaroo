@@ -30,6 +30,6 @@ jobs:
       run: |
         uv sync
 
-    - name: lint
+    - name: tests
       run: |
         source .venv/bin/activate && make tests
