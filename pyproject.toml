@@ -25,3 +25,8 @@ testpaths = ["app"]
 pythonpath = ["."]
 addopts = "-v --tb=short"
 python_files="*_test.py"
+
+[dependency-groups]
+dev = [
+    "pytest-httpserver>=1.1.5",
+]
