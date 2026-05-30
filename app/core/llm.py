@@ -6,30 +6,34 @@ from openai import OpenAI
 from app.schemas.models import ItemizedReciept, SplitBreakdown
 
 
-## TODO: This is unused right now.
-def get_oai_api_key():
+def get_oai_secret():
+    """
+    Helper method to retrieve oai api key from aws secrets manager
+    """
 
     secret_name = "OPENAI_API_KEY"
     region_name = "us-east-2"
 
+    # Create a Secrets Manager client
     session = boto3.session.Session()
-    client = session.client(service_name="secretsmanager", region_name=region_name)
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name
+    )
 
     try:
-        get_secret_value_response = client.get_secret_value(SecretId=secret_name)
-    except ClientError as e:
-        raise e
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except Exception as e:
+        raise Exception(f"Something went wrong while getting the oai key: {e}")
 
-    oai_api_key = get_secret_value_response["SecretString"]
+    secret = get_secret_value_response['SecretString']
 
-    return oai_api_key
+    return secret
 
 
-load_dotenv()
-
-oai_api_key = os.getenv("OPENAI_API_KEY")
-
-# oai_api_key = get_oai_api_key()
+oai_api_key = get_oai_secret()
 
 
 client = OpenAI(api_key=oai_api_key)
