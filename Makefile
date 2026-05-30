@@ -10,5 +10,8 @@ run-image:
 lint: 
 	black . --check
 
+tests: 
+	uv run pytest 
+
 fix-lint: 
 	black . 

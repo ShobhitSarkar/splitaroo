@@ -25,6 +25,12 @@ async def get_reciept(file: UploadFile = File(...)) -> ItemizedReciept:
     :rtype: ItemizedReciept
     """
 
+    if not isinstance(file, File):
+        raise Exception("Given file is not of file object type.")
+
+    if file is None:
+        raise Exception("File can't be None.")
+
     file_bytes = await file.read()
     image_encoded = base64.b64encode(file_bytes).decode("utf-8")
     mime_type = file.content_type
@@ -52,6 +58,12 @@ async def who_got_what(unstructured_data: str) -> None:
     :rtype: IndividualSplit
     """
 
+    if not isinstance(unstructured_data, str):
+        raise Exception("Unstructured data is not string.")
+
+    if unstructured_data is None:
+        raise Exception("Unstructured data can't be None.")
+
     guardrail_check = await guardrail_text(unstructured_data)
 
     if guardrail_check == False:
@@ -76,6 +88,18 @@ async def get_reciept_details(
     :return: dict where key is the person, value is the amount owed
     :rtype: dict
     """
+
+    if customer_reciept is None:
+        raise Exception("customer_reciept can't be None")
+
+    if customer_split_breakdown is None:
+        raise Exception("split breakdown can't be none")
+
+    if not isinstance(customer_reciept, ItemizedReciept):
+        raise Exception("customer_reciept is not the correct shape")
+
+    if not isinstance(customer_split_breakdown, SplitBreakdown):
+        raise Exception("customer_split_breakdown is not in the correct shape")
 
     final_split = split_calculator(customer_reciept, customer_split_breakdown)
 

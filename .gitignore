@@ -16,3 +16,5 @@ scratch.md
 # environment variables 
 
 .env
+
+.pytest_cache

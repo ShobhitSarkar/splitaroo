@@ -11,6 +11,17 @@ def split_calculator(
     takes in an itemized reciept, who got what and then returns the per person split
 
     """
+    if itemized_reciept is None:
+        raise Exception("Itemized Reciept is None")
+
+    if split_breakdown is None:
+        raise Exception("Split Breakdown is None")
+
+    if not isinstance(itemized_reciept, ItemizedReciept):
+        raise Exception("Itemized Reciept is not the correct shape.")
+
+    if not isinstance(split_breakdown, SplitBreakdown):
+        raise Exception("The split breakdown is not the correct shape.")
 
     reciept_dict = {}
     people_dict = {}
