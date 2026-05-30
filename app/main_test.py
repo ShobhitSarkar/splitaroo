@@ -19,7 +19,9 @@ def test_main_prints_greeting(capsys) -> None:
 
 
 def test_fastapi_app_has_receipt_router_mounted() -> None:
-    paths = {route.path for route in main_module.app.routes if isinstance(route, APIRoute)}
+    paths = {
+        route.path for route in main_module.app.routes if isinstance(route, APIRoute)
+    }
     assert "/receipt/uploadReciept" in paths
     assert "/receipt/unstructuredData" in paths
     assert "/receipt/get_split" in paths

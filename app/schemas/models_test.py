@@ -20,7 +20,6 @@ from app.schemas.models import (
     SplitBreakdown,
 )
 
-
 # ---- Item -------------------------------------------------------------------
 
 

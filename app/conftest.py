@@ -84,9 +84,9 @@ def make_transcription_payload(text: str) -> dict[str, Any]:
 
 def expect_openai_responses(httpserver, text_payload: str) -> None:
     """Register a /v1/responses POST that returns the given text for every call."""
-    httpserver.expect_request(
-        "/v1/responses", method="POST"
-    ).respond_with_json(make_openai_response_payload(text_payload))
+    httpserver.expect_request("/v1/responses", method="POST").respond_with_json(
+        make_openai_response_payload(text_payload)
+    )
 
 
 def queue_openai_responses(httpserver, *text_payloads: str) -> None:
@@ -109,9 +109,9 @@ def expect_openai_transcription(httpserver, text: str) -> None:
 
 
 def expect_openai_failure(httpserver, status: int = 500) -> None:
-    httpserver.expect_request(
-        "/v1/responses", method="POST"
-    ).respond_with_data("oh no", status=status)
+    httpserver.expect_request("/v1/responses", method="POST").respond_with_data(
+        "oh no", status=status
+    )
 
 
 def expect_secretsmanager_get(aws_httpserver, secret_value: str) -> None:
